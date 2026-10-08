@@ -76,7 +76,6 @@ hey -n 5000 -c 200 http://localhost:8000/<endpoint>
 
 **The service did not fail, but it was already degraded.** All 5,000 requests returned `200`, which is easy to misread as headroom. A p50 of 1.48 s and a p99 of 3.42 s is well past acceptable for an interactive API — the service was returning successful responses too slowly to be usable. Status codes were the wrong success criterion.
 
-**Deployment implication:** 344 MB/s is ~2.75 Gbit/s. This test ran over loopback, so the network was free. On a 1 GbE link (125 MB/s) the NIC would saturate at roughly 43 req/s — the network would have become the bottleneck well before the application did.
 
 **Limitation — no breaking point was established.** `hey` is a closed-loop generator: it holds 200 requests in flight and issues the next only when one returns, so it throttles itself to the service's own speed and cannot produce sustained overload. Little's Law confirms the test ran at full concurrency (118.5 req/s × 1.652 s ≈ 196 ≈ 200 in flight). Finding the actual ceiling requires an open-loop, fixed-arrival-rate generator.
 
